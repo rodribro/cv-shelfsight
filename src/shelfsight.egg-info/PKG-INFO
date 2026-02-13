@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: shelfsight
+Version: 0.1.0
+Summary: Retail shelf detection pipeline (API + batch + AWS)
+Requires-Python: <3.12,>=3.11
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.27
+Requires-Dist: pydantic>=2.6
+Requires-Dist: python-multipart>=0.0.9
+Requires-Dist: pandas>=2.0
+Requires-Dist: boto3>=1.28
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: psycopg2-binary>=2.9
+Requires-Dist: pytest>=8.0
+Requires-Dist: httpx>=0.27
+Requires-Dist: ultralytics>=8.0

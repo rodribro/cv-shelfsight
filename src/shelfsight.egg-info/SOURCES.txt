@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+src/shelfsight.egg-info/PKG-INFO
+src/shelfsight.egg-info/SOURCES.txt
+src/shelfsight.egg-info/dependency_links.txt
+src/shelfsight.egg-info/requires.txt
+src/shelfsight.egg-info/top_level.txt
