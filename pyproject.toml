@@ -16,9 +16,15 @@ dependencies = [
   "boto3>=1.28",
   "sqlalchemy>=2.0",
   "psycopg2-binary>=2.9",
+  "ultralytics>=8.0"
+]
+
+[project.optional-dependencies]
+dev = [
   "pytest>=8.0",
   "httpx>=0.27",
-  "ultralytics>=8.0"
+  "ruff>=0.5",
+  "black>=24.0",
 ]
 
 # setuptools configuration for src-layout package discovery
@@ -32,3 +38,15 @@ include = ["shelfsight*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+# E/F: pycodestyle/pyflakes, I: isort, B: bugbear
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
