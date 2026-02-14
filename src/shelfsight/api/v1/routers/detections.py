@@ -32,7 +32,10 @@ def validate_image_upload(data: bytes, content_type: str) -> None:
 async def upload(file: UploadFile = File(...)):
 
     data = await file.read()
+    await file.close()
+    
     content_type = file.content_type or ""
+
 
     validate_image_upload(data, content_type)
     
