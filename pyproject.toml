@@ -12,21 +12,39 @@ dependencies = [
   "uvicorn[standard]>=0.27",
   "pydantic>=2.6",
   "python-multipart>=0.0.9",
-  "pandas>=2.0",
-  "boto3>=1.28",
-  "sqlalchemy>=2.0",
-  "psycopg2-binary>=2.9",
-  "ultralytics>=8.0"
 ]
 
 [project.optional-dependencies]
-dev = [
+test = [
   "pytest>=8.0",
   "httpx>=0.27",
+]
+
+lint = [
   "ruff>=0.5",
   "black>=24.0",
 ]
 
+dev = [
+  "shelfsight[test,lint]",
+]
+
+aws = [
+  "boto3>=1.28",
+]
+
+db = [
+  "sqlalchemy>=2.0",
+  "psycopg2-binary>=2.9",
+]
+
+inference = [
+  "ultralytics>=8.0",
+]
+
+data = [
+  "pandas>=2.0",
+]
 # setuptools configuration for src-layout package discovery
 [tool.setuptools]
 package-dir = {"" = "src"}
