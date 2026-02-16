@@ -12,6 +12,7 @@ dependencies = [
   "uvicorn[standard]>=0.27",
   "pydantic>=2.6",
   "python-multipart>=0.0.9",
+  "Pillow>=10.0"
 ]
 
 [project.optional-dependencies]
@@ -58,7 +59,8 @@ testpaths = ["tests"]
 addopts = "-ra"
 
 [tool.ruff]
-line-length = 88
+ignore = ["B008"] # B008 conflicts with FastAPI dependency injection
+line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
@@ -66,5 +68,5 @@ select = ["E", "F", "I", "B"]
 # E/F: pycodestyle/pyflakes, I: isort, B: bugbear
 
 [tool.black]
-line-length = 88
+line-length = 100
 target-version = ["py311"]
