@@ -1,9 +1,9 @@
-from io import BytesIO
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
-from PIL import Image
-
-from shelfsight.services.detection import DetectionService
+from shelfsight.api.dependencies import get_detection_service
+from shelfsight.api.v1.schemas.detection_schema import DetectionInput, Source
+from shelfsight.services.detection_service import DetectionService, InvalidImageError
+from shelfsight.services.image_utils import validate_and_get_image_info
 
 router = APIRouter(prefix="/detections", tags=["detections"])
 
@@ -11,45 +11,41 @@ MAX_BYTES = 50 * 1024 * 1024  # 50 MB limit
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png"}
 
 
-def validate_image_upload(data: bytes, content_type: str) -> None:
-
-    if not data:
-        raise HTTPException(status_code=400, detail="Empty file uploaded.")
-
-    if len(data) > MAX_BYTES:
-        raise HTTPException(status_code=413, detail="File size exceeds 50 MB limit.")
-
-    if content_type and content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=415, detail="Invalid file type. JPEG/PNG only")
-
-    try:
-        img = Image.open(BytesIO(data))
-        img.verify()
-
-    except Exception as err:
-        raise HTTPException(
-            status_code=415,
-            detail="Corrupted or unreadable image.",
-        ) from err
-
-
 @router.post("/", summary="Run model inference", description="Inference endpoint")
-async def upload(file: UploadFile = File(...)):
+async def upload(
+    file: UploadFile = File(...),
+    detection_service: DetectionService = Depends(get_detection_service),
+):
 
-    data = await file.read()
+    image_bytes = await file.read()
     await file.close()
-
     content_type = file.content_type or ""
 
-    validate_image_upload(data, content_type)
+    try:
+        image_info = validate_and_get_image_info(
+            image_bytes,
+            max_bytes=MAX_BYTES,
+            allowed_content_types=ALLOWED_CONTENT_TYPES,
+            content_type=file.content_type,
+        )
+    except InvalidImageError as e:
+        msg = str(e)
+
+        status_code = 415
+        if "exceeds" in msg:
+            status_code = 413
+
+        raise HTTPException(status_code=status_code, detail=msg) from e
 
     detection_service = DetectionService(model=None)
-    run_id, detections, total_detections, products = detection_service.create_run(data)
+    detection_input = DetectionInput(
+        image_bytes=image_bytes,
+        filename=file.filename,
+        content_type=content_type,
+        source=Source.upload,
+        image_height=image_info.height,
+        image_width=image_info.width,
+    )
+    detection = detection_service.create_run(detection_input)
 
-    return {
-        "run_id": run_id,
-        "status": "completed",
-        "source": "upload",
-        "detections": detections,
-        "summary": {"total_detections": total_detections, "products": products},
-    }
+    return detection
